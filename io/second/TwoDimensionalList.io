@@ -1,5 +1,5 @@
 TwoDimensionalList := Object clone do (
-  inner := nil // creates inner list to store other arrays
+  inner := List clone // creates inner list to store other arrays
 )
 
 TwoDimensionalList dim := method(x,y,
@@ -8,7 +8,7 @@ TwoDimensionalList dim := method(x,y,
 )
 
 TwoDimensionalList set := method(x,y,value, 
-  inner at(y) insertAt(value, x) 
+  inner at(y) atPut(x, value) 
 )
 
 TwoDimensionalList get := method(x,y, 
@@ -16,24 +16,45 @@ TwoDimensionalList get := method(x,y,
 )
 
 TwoDimensionalList xSize := method(
-  if (inner == nil or inner size() == 0, 0, inner at(0) size())
+  if (inner size == 0, 0, inner at(0) size)
 )
 
 TwoDimensionalList ySize := method(
-  if (inner == nil , 0, inner size())
+  inner size
 )
 
 TwoDimensionalList transpose := method(
   result := TwoDimensionalList clone;
-  if (inner != nil, 
-    result dim(ySize(), xSize())
-    for(i, 0, xSize() - 1,
-      for(j, 0, ySize() - 1,
-        result set(j, i, get(i, j))
-      ) 
+  result dim(ySize, xSize);
+  for(i, 0, xSize - 1,
+    for(j, 0, ySize - 1,
+      result set(j, i, get(i, j))
     )
   )
   result;
+)
+
+TwoDimensionalList toFile := method(path,
+  tempFile := File clone openForUpdating(path)
+  inner foreach(line, 
+    tempFile write(line join(" "), "\n")
+  )
+  tempFile close
+)
+
+File toTwoDimensionalList := method(
+  result := TwoDimensionalList clone
+  lines := readLines
+  if (lines size > 0,
+    x := lines at(0) split size;
+    result dim(x, lines size);
+    chunks := nil;
+    lines foreach(i, line, 
+      chunks = line split;
+      chunks foreach(j, chunk, result set(j, i, chunk))
+    )
+  );
+  result
 )
 
 test := TwoDimensionalList clone
@@ -43,8 +64,15 @@ test set(0,1,"hola")
 test set(2,3,3)
 test get(0,1) println
 test get(2,3) println
+test toFile("/tmp/test")
 
-transposed := test transpose()
+transposed := test transpose
 
 transposed get (1, 0) println
 transposed get (3, 2) println
+
+file := File clone openForReading("/tmp/test")
+readlist := file toTwoDimensionalList
+readlist toFile("/tmp/test2")
+file close
+
