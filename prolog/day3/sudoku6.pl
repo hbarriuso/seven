@@ -43,4 +43,22 @@ sudoku(
     valid([Row1, Row2, Row3, Row4, Row5, Row6]),
     valid([Col1, Col2, Col3, Col4, Col5, Col6]),
     valid([Square1, Square2, Square3, 
-           Square4, Square5, Square6]).
+           Square4, Square5, Square6]),
+
+    print(Row1), write('\n'),
+    write(Row2), write('\n'),
+    write(Row3), write('\n'),
+    write(Row4), write('\n'),
+    write(Row5), write('\n'),
+    write(Row6),
+
+    fail.
+
+sudoku(
+    S11, S12, S13, S14, S15, S16,
+    S21, S22, S23, S24, S25, S26,
+    S31, S32, S33, S34, S35, S36,
+    S41, S42, S43, S44, S45, S46,
+    S51, S52, S53, S54, S55, S56,
+    S61, S62, S63, S64, S65, S66,
+        Board).
