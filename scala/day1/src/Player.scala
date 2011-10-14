@@ -11,7 +11,7 @@ object X extends Player with Human {
   override def toString() = "X"
 }
 
-object O extends Player with Computer {
+object O extends Player with Human {
   def next = X
   override def toString() = "O"
 }

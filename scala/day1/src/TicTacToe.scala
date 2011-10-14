@@ -18,10 +18,11 @@ class TicTacToe {
     if (player == current) {
       board.update(position - 1, player.toString())
       printBoard
-      current = player.next
       if (checkResult(player)) {
         println(player + " wins.")
+        exit
       } else {
+        current = player.next
         println("Next move for " + current + ":")
         current.play(this)
       }
