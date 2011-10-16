@@ -3,7 +3,15 @@ import scala.actors._
 import Actor._
 
 object PageLoader {
-  def getPageSize(url: String) = Source.fromURL(url).mkString.length
+  val reg = "<a [^>]*>".r
+
+  def processPage(url: String) {
+    val content = getPage(url)
+    println("Size for " + url + ": " + content.length)
+    println("Number of links in " + url + ": " + countLinks(content))
+  }
+  def getPage(url: String) = Source.fromURL(url)(Codec("ISO-8859-1")).mkString
+  def countLinks(content: String) = reg.findAllIn(content).length
 }
 
 class Sizer {
@@ -21,7 +29,7 @@ class Sizer {
 
   def getPageSizeSequentially() = {
     for (url <- urls) {
-      println("Size for " + url + ": " + PageLoader.getPageSize(url))
+      PageLoader.processPage(url)
     }
   }
 
@@ -29,13 +37,14 @@ class Sizer {
     val caller = self
 
     for (url <- urls) {
-      actor { caller ! (url, PageLoader.getPageSize(url)) }
+      actor { caller ! (url, PageLoader.getPage(url)) }
     }
 
     for (i <- 1 to urls.size) {
       receive {
-        case (url, size) =>
-          println("Size for " + url + ": " + size)
+        case (url, content: String) =>
+          println("Size for " + url + ": " + content.length)
+          println("Number of links in " + url + ": " + PageLoader.countLinks(content))
       }
     }
   }
@@ -44,7 +53,7 @@ class Sizer {
 object Sizer extends Application {
   override def main(args: Array[String]) = {
     val sizer = new Sizer
-    
+
     println("Sequential run:")
     sizer.timeMethod { sizer.getPageSizeSequentially }
 
